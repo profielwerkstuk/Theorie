@@ -32,13 +32,13 @@ class RandomHashSet<TYPE> {
     addSorted(object: any) {
         for (let i = 0; i < this.size(); i++) {
             const innovation = (this.arrayList[i] as Gene).getInnovationNumber();
-            
+
             if (object.getInnovationNumber() < innovation) {
                 this.arrayList[i] = object;
                 this.hashSet.add(object);
                 return;
             }
-            
+
         }
 
         this.add(object)
@@ -93,7 +93,7 @@ class RandomSelector<TYPE> {
 
         let random = Math.random() * this.total_score;
         let c = 0;
-        for(let i = 0; i < this.objects.length; i++) {
+        for (let i = 0; i < this.objects.length; i++) {
             c += this.scores[i];
             if (c > random) return this.objects[i];
         }
@@ -190,7 +190,7 @@ class ConnectionGene extends Gene {
     getReplaceIndex(): number | undefined {
         return this.replaceIndex;
     }
-    
+
     getFrom(): NodeGene {
         return this.from;
     }
@@ -242,7 +242,7 @@ class Genome {
     }
 
     distance(g2: Genome): number {
-        
+
         let g1: Genome = this
 
         let highestInnovationG1 = (g1.getConnections().size() != 0 ? g1.getConnections().get(g1.getConnections().size() - 1)?.getInnovationNumber() : 0) ?? 0
@@ -262,14 +262,14 @@ class Genome {
         let weightDiff = 0;
         let similar = 0;
 
-        while(indexg1 < g1.getConnections().size() && indexg2 < g2.getConnections().size()) {
+        while (indexg1 < g1.getConnections().size() && indexg2 < g2.getConnections().size()) {
             const c1: ConnectionGene | null = g1.getConnections().get(indexg1)
             const c2: ConnectionGene | null = g2.getConnections().get(indexg2)
 
             const in1: number | null = c1?.getInnovationNumber() ?? null;
             const in2: number | null = c2?.getInnovationNumber() ?? null;
 
-            if(in1 == in2) {
+            if (in1 == in2) {
                 similar++;
                 weightDiff += Math.abs((c1?.getWeight() ?? 0) - (c2?.getWeight() ?? 0));
                 indexg1++;
@@ -287,34 +287,34 @@ class Genome {
         excess = g1.getConnections().size() - indexg1;
 
         let N = Math.max(g1.getConnections().size(), g2.getConnections().size());
-        if(N <20) N = 1;
+        if (N < 20) N = 1;
 
         return neat.getC1() * disjoint / N + neat.getC2() * excess / N + neat.getC3() * weightDiff
     }
 
     crossover(g1: Genome, g2: Genome): Genome {
-        
+
         const neat = g1.getNeat();
         const child = neat.emptyGenome();
 
         let indexg1 = 0;
         let indexg2 = 0;
 
-        while(indexg1 < g1.getConnections().size() && indexg2 < g2.getConnections().size()) {
+        while (indexg1 < g1.getConnections().size() && indexg2 < g2.getConnections().size()) {
             const gene1: ConnectionGene | null = g1.getConnections().get(indexg1)
             const gene2: ConnectionGene | null = g2.getConnections().get(indexg2)
 
             const in1: number = (gene1?.getInnovationNumber()) ?? 0;
             const in2: number = (gene2?.getInnovationNumber()) ?? 0;
 
-            if(in1 == in2 && gene1 && gene2) {
+            if (in1 == in2 && gene1 && gene2) {
 
-                if(Math.random() < 0.5) {
+                if (Math.random() < 0.5) {
                     child.getConnections().add(neat.getConnection(gene1));
                 } else {
                     child.getConnections().add(neat.getConnection(gene2));
                 }
-                
+
                 indexg1++;
                 indexg2++;
             } else if (in1 > in2) {
@@ -327,7 +327,7 @@ class Genome {
 
         while (indexg1 < g1.getConnections().size()) {
             const gene1: ConnectionGene | null = g1.getConnections().get(indexg1)
-            if(gene1) child.getConnections().add(neat.getConnection(gene1));
+            if (gene1) child.getConnections().add(neat.getConnection(gene1));
             indexg1++;
         }
 
@@ -340,32 +340,32 @@ class Genome {
     }
 
     mutate(): void {
-        if(neat.getPROBABILITY_MutateNode() > Math.random()) this.mutateNode();
-        if(neat.getPROBABILITY_MutateLink() > Math.random()) this.mutateLink();
-        if(neat.getPROBABILITY_MutateToggleLink() > Math.random()) this.mutateLinkToggle();
-        if(neat.getPROBABILITY_MutateWeightRandom() > Math.random()) this.mutateWeightRandom();
-        if(neat.getPROBABILITY_MutateWeightShift() > Math.random()) this.mutateWeightShift();
+        if (neat.getPROBABILITY_MutateNode() > Math.random()) this.mutateNode();
+        if (neat.getPROBABILITY_MutateLink() > Math.random()) this.mutateLink();
+        if (neat.getPROBABILITY_MutateToggleLink() > Math.random()) this.mutateLinkToggle();
+        if (neat.getPROBABILITY_MutateWeightRandom() > Math.random()) this.mutateWeightRandom();
+        if (neat.getPROBABILITY_MutateWeightShift() > Math.random()) this.mutateWeightShift();
     }
 
     mutateLink(): void {
-        for(let i = 0; i < 100; i++) {
+        for (let i = 0; i < 100; i++) {
             const a = this.nodes.randomElement();
             const b = this.nodes.randomElement();
 
-            if(a?.getX() == b?.getX()) continue;
+            if (a?.getX() == b?.getX()) continue;
 
             let connection
-            if((a?.getX() ?? 0) < (b?.getX() ?? 0)) {
+            if ((a?.getX() ?? 0) < (b?.getX() ?? 0)) {
                 connection = new ConnectionGene(a!, b!);
             } else {
                 connection = new ConnectionGene(b!, a!);
             }
 
-            if(this.connections.contains(connection)) continue;
+            if (this.connections.contains(connection)) continue;
 
             connection = neat.getConnection(connection.getFrom(), connection.getTo());
             connection.setWeight((Math.random() * 2 - 1) * neat.getWeightRandomStrength());
-            
+
             this.connections.addSorted(connection);
             return;
         }
@@ -373,16 +373,16 @@ class Genome {
 
     mutateNode(): void {
         const connection = this.connections.randomElement();
-        if(!connection?.getFrom) return;
+        if (!connection?.getFrom) return;
 
         const from = connection.getFrom()
         const to = connection.getFrom()
 
         const replaceIndex = neat.getReplaceIndex(from, to)
-        
+
         let middle;
 
-        if(replaceIndex == 0) {
+        if (replaceIndex == 0) {
             let middle = neat.getNode()
             middle?.setX((from.getX() + to.getX()) / 2)
             middle?.setY((from.getY() + to.getY()) / 2 * Math.random() * 0.1 - 0.05)
@@ -409,21 +409,21 @@ class Genome {
 
     mutateWeightShift(): void {
         const con = this.connections.randomElement();
-        if(con?.getWeight) {
+        if (con?.getWeight) {
             con.setWeight(con.getWeight() + (Math.random() * 2 - 1) * neat.getWeightRandomStrength());
         }
     }
 
     mutateWeightRandom(): void {
         const con = this.connections.randomElement();
-        if(con?.setWeight) {
+        if (con?.setWeight) {
             con.setWeight((Math.random() * 2 - 1) * neat.getWeightRandomStrength());
         }
     }
 
     mutateLinkToggle(): void {
         const con = this.connections.randomElement();
-        if(con?.isEnabled) {
+        if (con?.isEnabled) {
             con.setEnabled(!con.isEnabled());
         }
     }
@@ -485,12 +485,12 @@ class Neat {
     emptyGenome(): Genome {
         const genome = new Genome(this);
 
-        for(let i = 0; i < this.inputSize + this.outputSize; i++) {
+        for (let i = 0; i < this.inputSize + this.outputSize; i++) {
             genome.getNodes().add(this.getNode(i + 1)!);
         }
 
         return genome;
-    } 
+    }
 
     reset(inputSize: number, outputSize: number, clients: number): void {
         this.inputSize = inputSize;
@@ -501,18 +501,18 @@ class Neat {
         this.allNodes.clear();
         this.clients.clear();
 
-        for(let i = 0; i < inputSize; i++) {
+        for (let i = 0; i < inputSize; i++) {
             const node = this.getNode();
             node?.setX(0.1);
             node?.setType("input");
-            node?.setY((i + 1)/ (inputSize + 1))
+            node?.setY((i + 1) / (inputSize + 1))
         }
 
-        for(let i = 0; i < outputSize; i++) {
+        for (let i = 0; i < outputSize; i++) {
             const node = this.getNode();
             node?.setX(0.9);
             node?.setType("output");
-            node?.setY((i + 1)/ (outputSize + 1))
+            node?.setY((i + 1) / (outputSize + 1))
         }
 
         for (let i = 0; i < this.maxClients; i++) {
@@ -536,7 +536,7 @@ class Neat {
     }
 
     getConnection(from: NodeGene | ConnectionGene, to?: NodeGene): ConnectionGene {
-        if(to && from instanceof NodeGene && !(from instanceof ConnectionGene)) {
+        if (to && from instanceof NodeGene && !(from instanceof ConnectionGene)) {
             const connectionGene = new ConnectionGene(from, to);
 
             const geneInConnections = this.allConnections.get(connectionGene)
@@ -559,12 +559,12 @@ class Neat {
     }
 
     getNode(id?: number): NodeGene | null {
-        if(!id) {
+        if (!id) {
             const node = new NodeGene(this.allNodes.size() + 1);
             this.allNodes.add(node);
             return node;
         } else {
-            if(id <= this.allNodes.size()) return this.allNodes.get(id - 1);
+            if (id <= this.allNodes.size()) return this.allNodes.get(id - 1);
             else {
                 return this.getNode();
             }
@@ -590,19 +590,19 @@ class Neat {
 
         for (let i = 0; i < this.clients.getData().length; i++) {
             const client = this.clients.getData()[i];
-            if(client.getSpecies() != null) continue;
+            if (client.getSpecies() != null) continue;
 
             let found = false;
 
             for (let i = 0; i < this.species.getData().length; i++) {
                 const species = this.species.getData()[i];
-                if(species.put(client)) {
+                if (species.put(client)) {
                     found = true;
                     break;
                 };
             };
 
-            if(!found) {
+            if (!found) {
                 this.species.add(new Species(client))
             }
         };
@@ -620,7 +620,7 @@ class Neat {
 
     removeExtinctSpecies() {
         for (let i = this.species.size() - 1; i >= 0; i--) {
-            if(this.species.size() <= 1) {
+            if (this.species.size() <= 1) {
                 this.species.get(i)?.goExtinct()
                 this.species.remove(i);
             }
@@ -634,10 +634,10 @@ class Neat {
         });
 
         this.clients.getData().forEach(client => {
-            if(client.getSpecies() == null) {
+            if (client.getSpecies() == null) {
                 const species = selector.random();
                 const genome = species?.breed();
-                if(!genome) return;
+                if (!genome) return;
                 client.setGenome(genome);
                 species?.forcePut(client);
             }
@@ -714,7 +714,7 @@ class Connection {
     to: _Node;
     weight: number = 0;
     enabled: boolean = true;
-    
+
     getFrom(): _Node {
         return this.from;
     }
@@ -760,7 +760,7 @@ class _Node {
     calculate(): void {
         let sum = 0;
         this.connections.forEach(connection => {
-            if(connection.isEnabled()) {
+            if (connection.isEnabled()) {
                 sum += connection.getWeight() * connection.getFrom().getOutput();
             }
         });
@@ -779,7 +779,7 @@ class _Node {
     setX(x: number): void {
         this.x = x;
     }
-    
+
     getOutput(): number {
         return this.output;
     }
@@ -797,8 +797,8 @@ class _Node {
     }
 
     compareTo(node: _Node): number {
-        if(this.x > node.getX()) return -1;
-        if(this.x < node.getX()) return 1;
+        if (this.x > node.getX()) return -1;
+        if (this.x < node.getX()) return 1;
         return 0;
     }
 }
@@ -819,9 +819,9 @@ class Calculator {
             const node = new _Node(n.getX())
             nodeHashMap.set(n.getInnovationNumber(), node);
 
-            if(n.getType() === "input") {
+            if (n.getType() === "input") {
                 this.inputNodes.push(node);
-            } else if(n.getType() === "output") {
+            } else if (n.getType() === "output") {
                 this.outputNodes.push(node);
             } else {
                 this.hiddenNodes.push(node);
@@ -886,8 +886,8 @@ class Client {
 
     calculate(input: number[]): number[] {
         if (input.length != neat.inputSize) throw new Error("Input size is not correct");
-        if(!this.calculator) this.generateCalculator();
-        if(this.calculator != null) {
+        if (!this.calculator) this.generateCalculator();
+        if (this.calculator != null) {
             return this.calculator.calculate(input);
         }
         return [-1]
@@ -932,9 +932,9 @@ class Species {
         this.representative.setSpecies(this);
         this.clients.add(representative)
     }
-    
+
     put(client: Client): boolean {
-        if(client.distance(this.representative!) > (this.representative?.getGenome()?.getNeat().getCP() ?? 0)) {
+        if (client.distance(this.representative!) > (this.representative?.getGenome()?.getNeat().getCP() ?? 0)) {
             client.setSpecies(this);
             this.clients.add(client);
             return true;
@@ -946,7 +946,7 @@ class Species {
         client.setSpecies(this);
         this.clients.add(client);
     }
-    
+
     goExtinct(): void {
         this.clients.getData().forEach(client => {
             client.setSpecies(null);
@@ -964,7 +964,7 @@ class Species {
 
     reset() {
         this.representative = this.clients.randomElement();
-        
+
         this.clients.getData().forEach(client => {
             client.setSpecies(null);
         });
@@ -978,8 +978,8 @@ class Species {
 
     kill(percentage: number): void {
         this.clients.getData().sort((a, b) => {
-            if(a.getScore() > b.getScore()) return -1;
-            if(a.getScore() < b.getScore()) return 1;
+            if (a.getScore() > b.getScore()) return -1;
+            if (a.getScore() < b.getScore()) return 1;
             return 0;
         });
 
@@ -994,9 +994,9 @@ class Species {
         const c1 = this.clients.randomElement();
         const c2 = this.clients.randomElement();
 
-        if(!c1?.getGenome() && !c2?.getGenome()) return null;
+        if (!c1?.getGenome() && !c2?.getGenome()) return null;
         else {
-            if(c1!.getScore() > c2!.getScore()) return genome.crossover(c1?.getGenome(), c2?.getGenome());
+            if (c1!.getScore() > c2!.getScore()) return genome.crossover(c1?.getGenome(), c2?.getGenome());
             return genome.crossover(c2.getGenome(), c1.getGenome());
         }
     }
