@@ -769,7 +769,8 @@ class _Node {
     }
 
     activationFunction(x: number): number {
-        return 1 / (1 + Math.exp(-x));
+        // return 1 / (1 + Math.exp(-x));
+        return x > 0 ? x : 0;
     }
 
     getX(): number {
@@ -1021,33 +1022,29 @@ class Species {
 let neat: Neat;
 let genome: Genome;
 let input: number[];
-neat = new Neat(2, 1, 1000);
+const inputs = [[0, 0], [1, 1], [1, 0], [0, 1]];
+neat = new Neat(2, 1, 1500);
 
-for (let i = 0; i < 100; i++) {
+function fitness(client: Client) {
+	let fitness = 4;
+	fitness -= Math.abs(client.calculate([1, 1])[0]);
+	fitness -= Math.abs(client.calculate([1, 0])[0] - 1);
+	fitness -= Math.abs(client.calculate([0, 1])[0] - 1);
+	fitness -= Math.abs(client.calculate([0, 0])[0]);
+	if ((client.getGenome()?.connections.size()) ?? 0 < 2) fitness *= 0.001;
+
+	return Math.max(fitness, 0.001);
+}
+
+for (let i = 0; i < 1500; i++) {
     neat.clients.getData().forEach(client => {
-        input = [Math.round(Math.random()), Math.round(Math.random())]
-        const output = Math.round(client.calculate(input)[0])
-        const correctOutput = input[0] ^ input[1]
-
-        const score = 1 / (1 + Math.abs(output - correctOutput));
-
-        client.setScore(score);
+        client.setScore(fitness(client));
     });
 
     neat.evolve();
     neat.printSpecies()
 }
 
-const results = new Set<Number>();
-
-neat.clients.getData().forEach(client => {
-    const output = client.calculate([1, 0])[0]
-
-    const correctOutput = 1
-
-    const score = 1 / (1 + Math.abs(output - correctOutput));
-    results.add(Math.round(score))
-    client.setScore(score);
+inputs.forEach(input => {
+    console.log(input, neat.clients.getData()[0].calculate(input)[0]);
 });
-
-console.log(results)
