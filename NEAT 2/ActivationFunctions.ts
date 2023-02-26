@@ -1,5 +1,5 @@
 interface ActivationFunction {
-	(input: number, alpha: number): number;
+	(input: number, alpha?: number): number;
 }
 
 const SIGMOID: ActivationFunction = (input: number): number => {
@@ -18,8 +18,8 @@ const Gaussian: ActivationFunction = (input: number): number => {
 	return Math.exp(-(input**2));
 }
 
-const ELU: ActivationFunction = (input: number, alpha: number): number => {
-	return ((input > 0) ? input : (alpha*Math.expm1(input)));
+const ELU: ActivationFunction = (input: number, alpha?: number): number => {
+	return ((input > 0) ? input : (alpha!*Math.expm1(input)));
 }
 
 const SELU: ActivationFunction = (input: number): number => {

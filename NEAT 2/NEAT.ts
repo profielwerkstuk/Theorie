@@ -61,17 +61,17 @@ class NEAT {
 
 		this.species.push(new Species());
 		for (let i = 0; i < config.populationSize; i++) {
-			this.species[0].addGenome(new Genome({ in: config.structure.in, hidden: config.structure.hidden, out: config.structure.out, activationFunc: config.structure.activationFunction }));
+			this.species[0].addGenome(new Genome({ in: config.structure.in, hidden: config.structure.hidden, out: config.structure.out, activationFunction: config.structure.activationFunction }));
 		}
 	}
 
 	mutate() {
 		this.species.forEach(specie => {
-			specie.mutateNode(this.config.mutationRate.addNodeMR, this);
-			specie.mutateConnection(this.config.mutationRate.addConnectionMR, this);
-			specie.mutateDeactivateNode(this.config.mutationRate.removeNodeMR);
-			specie.mutateDeactivateConnection(this.config.mutationRate.removeConnectionMR);
-			specie.mutateWeight(this.config.mutationRate.changeWeightMR);
+			specie.mutateNode(this.config.mutationRate?.addNodeMR!, this);
+			specie.mutateConnection(this.config.mutationRate?.addConnectionMR!, this);
+			specie.mutateDeactivateNode(this.config.mutationRate?.removeNodeMR!);
+			specie.mutateDeactivateConnection(this.config.mutationRate?.removeConnectionMR!);
+			specie.mutateWeight(this.config.mutationRate?.changeWeightMR!);
 		});
 	}
 
@@ -81,7 +81,7 @@ class NEAT {
 			genomes = genomes.concat(this.species[i].getGenomes());
 		}
 
-		this.species = Species.speciate(genomes, this.config.distanceConstants);
+		this.species = Species.speciate(genomes, this.config.distanceConstants ?? {} as DistanceConfig);
 	}
 
 	assignPopulationLimit() {
@@ -110,7 +110,7 @@ class NEAT {
 	}
 
 	run(): Genome[] | undefined {
-		let fitness = [];
+		let fitness: Genome[] = [];
 		while (this.config.maxEpoch > this.epoch) {
 			fitness = [];
 			let genomes: Genome[] = [];
@@ -132,6 +132,8 @@ class NEAT {
 			this.mutate();
 			this.epoch++;
 		}
+
+		return
 	}
 }
 
